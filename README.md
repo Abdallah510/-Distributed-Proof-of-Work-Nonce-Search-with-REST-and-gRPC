@@ -119,34 +119,6 @@ The coordinator and workers can be started in any order. A worker retries until 
 Errors: **400** for invalid input (missing data, difficulty not 1–8, bad JSON), **404** for an unknown job,
 **409** when cancelling a finished job.
 
-With curl:
-
-```bash
-curl -X POST localhost:8080/jobs -d '{"data": "hello", "difficulty": 6}'
-curl localhost:8080/jobs/job-1
-curl -N localhost:8080/jobs/job-1/events
-curl -X DELETE localhost:8080/jobs/job-1
-curl localhost:8080/jobs
-curl localhost:8080/workers
-```
-
-In Windows PowerShell, type `curl.exe` (not `curl`) and escape the quotes in the JSON:
-`curl.exe -X POST localhost:8080/jobs -d '{\"data\":\"hello\",\"difficulty\":6}'`
-
-In Postman: choose the method, enter the URL, and for POST open **Body → raw → JSON** and paste the body.
-
-### What to look for in the logs
-
-| Situation | Coordinator log | Worker log |
-|---|---|---|
-| Work is split | `job job-1: range 3 [3000000, 4000000) -> w7002` | `[w7002] START job-1 [3000000, 4000000)` |
-| Nonce found | `job job-1 FOUND by w7001: nonce=..., cancelling other searches` | other workers: `STOPPED job-1 ...: context cancelled` |
-| Job cancelled (DELETE) | `job job-1 CANCELLED by client, cancelling its searches` | every worker: `STOPPED job-1 ...: context cancelled` |
-| Worker crashed (Ctrl+C) | `Search on w7002 failed (...); reassigning range 5` | |
-| Worker frozen | `worker w7003 missed heartbeats -> dead` | |
-
----
-
 ## Regenerating the gRPC code (only if you change a .proto file)
 
 ```bash
