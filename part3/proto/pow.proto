@@ -1,0 +1,47 @@
+// Part 3 - Distributed Proof-of-Work nonce search.
+syntax = "proto3";
+
+package pow;
+
+option go_package = "puzzle/powpb";
+
+// Served by the coordinator, called by the workers.
+service Coordinator {
+  rpc RegisterWorker(RegisterRequest) returns (RegisterReply);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatReply);
+}
+
+// Served by every worker, called by the coordinator.
+service Worker {
+  // Server streaming: progress messages while searching, then one result.
+  rpc Search(SearchRequest) returns (stream SearchUpdate);
+}
+
+message RegisterRequest {
+  string worker_id = 1;
+  string address = 2;   // host:port of the worker's gRPC server
+}
+message RegisterReply {}
+
+message HeartbeatRequest {
+  string worker_id = 1;
+}
+message HeartbeatReply {
+  bool known = 1;       // false => the coordinator does not know this worker; register again
+}
+
+message SearchRequest {
+  string job_id = 1;
+  string data = 2;
+  int32 difficulty = 3;
+  uint64 start = 4;     // inclusive
+  uint64 end = 5;       // exclusive
+}
+
+message SearchUpdate {
+  uint64 checked = 1;   // nonces checked so far in this range
+  bool done = 2;        // true on the last message (the result)
+  bool found = 3;       // only meaningful when done = true
+  uint64 nonce = 4;
+  string hash = 5;
+}
