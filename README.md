@@ -1,4 +1,4 @@
-# ENCS5324 Assignment 1: gRPC chat room (Part 2) and distributed PoW search (Part 3)
+# ENCS5324 Assignment 1: gRPC chat room and distributed PoW search 
 
 ## Project layout
 
